@@ -91,7 +91,7 @@ def collate_fn(batch):
 
     return padded_texts, labels
 
-DATA_DIR = os.path.join('..', '')
+DATA_DIR = os.path.join('..', 'data')
 
 TRAIN_DIR = os.path.join(DATA_DIR, 'aclimdb', 'train')
 TEST_DIR = os.path.join(DATA_DIR, 'aclimdb', 'test')
