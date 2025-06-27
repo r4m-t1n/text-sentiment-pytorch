@@ -7,6 +7,10 @@ import torch
 from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import Dataset, DataLoader
 
+DATA_DIR = os.path.join('..', 'data')
+TRAIN_DIR = os.path.join(DATA_DIR, 'aclimdb', 'train')
+TEST_DIR = os.path.join(DATA_DIR, 'aclimdb', 'test')
+
 class IMDBDataset(Dataset):
     def __init__(self, data_dir, size: int, word2idx=None):
         super(IMDBDataset, self).__init__()
@@ -91,14 +95,10 @@ def collate_fn(batch):
 
     return padded_texts, labels
 
-DATA_DIR = os.path.join('..', 'data')
-
-TRAIN_DIR = os.path.join(DATA_DIR, 'aclimdb', 'train')
-TEST_DIR = os.path.join(DATA_DIR, 'aclimdb', 'test')
-
 temp_train = IMDBDataset(TRAIN_DIR, 5000) #5000 or whatever, the more the better words you extract
 
 words2idx = IMDBDataset.build_vocab(temp_train.samples)
+vocab_size = len(words2idx)
 
 train = IMDBDataset(TRAIN_DIR, 5000, words2idx)
 test = IMDBDataset(TEST_DIR, 1000, words2idx)
