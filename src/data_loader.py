@@ -22,7 +22,7 @@ class IMDBDataset(Dataset):
         random.seed(42)
 
         pos_dir = os.path.join(self.data_dir, 'pos')
-        pos_files = random.sample(os.listdir(pos_dir), size)
+        pos_files = random.sample(os.listdir(pos_dir), min(size, len(os.listdir(pos_dir))))
         for filename in pos_files:
             if filename.endswith('.txt'):
                 with open(os.path.join(pos_dir, filename), 'r', encoding='utf-8') as f:
@@ -32,7 +32,7 @@ class IMDBDataset(Dataset):
                     self.labels.append(1)
 
         neg_dir = os.path.join(self.data_dir, 'neg')
-        neg_files = random.sample(os.listdir(neg_dir), size)
+        neg_files = random.sample(os.listdir(neg_dir), min(size, len(os.listdir(neg_dir))))
         for filename in neg_files:
             if filename.endswith('.txt'):
                 with open(os.path.join(neg_dir, filename), 'r', encoding='utf-8') as f:
@@ -59,7 +59,7 @@ class IMDBDataset(Dataset):
         text = re.sub(r'<.*?>', ' ', text)
         text = re.sub(r'\s+', ' ', text)
         text = text.lower()
-        text = re.sub(r'[^a-z0-9\s]', '', text)
+        text = re.sub(r'[^a-z0-9\s.,!?;:]', '', text) 
         return text.strip()
 
     
@@ -73,7 +73,7 @@ class IMDBDataset(Dataset):
         return indices
 
     @staticmethod
-    def build_vocab(texts: list, max_vocab_size=10000, min_frequency=2):
+    def build_vocab(texts: list, max_vocab_size=30000, min_frequency=2):
         counter = Counter()
         for text in texts:
             words = text.split()
@@ -95,13 +95,13 @@ def collate_fn(batch):
 
     return padded_texts, labels
 
-temp_train = IMDBDataset(TRAIN_DIR, 5000) #5000 or whatever, the more the better words you extract
+temp_train = IMDBDataset(TRAIN_DIR, 12500) 
 
 words2idx = IMDBDataset.build_vocab(temp_train.samples)
 vocab_size = len(words2idx)
 
-train = IMDBDataset(TRAIN_DIR, 5000, words2idx)
-test = IMDBDataset(TEST_DIR, 1000, words2idx)
+train = IMDBDataset(TRAIN_DIR, 12500, words2idx)
+test = IMDBDataset(TEST_DIR, 12500, words2idx)
 
 train_loader = DataLoader(train, batch_size=32, shuffle=True, collate_fn=collate_fn)
 test_loader = DataLoader(test, batch_size=32, shuffle=False, collate_fn=collate_fn)
