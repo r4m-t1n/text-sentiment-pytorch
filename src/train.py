@@ -63,7 +63,7 @@ def evaluate(model, dataloader, criterion, device):
 
 if __name__ == "__main__":
 
-    num_epochs = 50
+    num_epochs = 20
 
     for epoch in range(start_epoch, num_epochs):
         train_loss = train(model, train_loader, criterion, optimizer, device)
