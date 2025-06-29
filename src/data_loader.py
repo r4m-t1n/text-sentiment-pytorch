@@ -8,8 +8,19 @@ from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import Dataset, DataLoader
 
 DATA_DIR = os.path.join('..', 'data')
-TRAIN_DIR = os.path.join(DATA_DIR, 'aclimdb', 'train')
-TEST_DIR = os.path.join(DATA_DIR, 'aclimdb', 'test')
+TRAIN_DIR = os.path.join(DATA_DIR, 'aclImdb', 'train')
+TEST_DIR = os.path.join(DATA_DIR, 'aclImdb', 'test')
+
+def set_seeds(seed_value=42):
+    random.seed(seed_value)
+    os.environ['PYTHONHASHSEED'] = str(seed_value)
+    torch.manual_seed(seed_value)
+    torch.cuda.manual_seed(seed_value)
+    torch.cuda.manual_seed_all(seed_value)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+set_seeds(42)
 
 class IMDBDataset(Dataset):
     def __init__(self, data_dir, size: int, word2idx=None):
@@ -19,15 +30,13 @@ class IMDBDataset(Dataset):
         self.samples = []
         self.labels = []
 
-        random.seed(42)
-
         pos_dir = os.path.join(self.data_dir, 'pos')
         pos_files = random.sample(os.listdir(pos_dir), min(size, len(os.listdir(pos_dir))))
         for filename in pos_files:
             if filename.endswith('.txt'):
                 with open(os.path.join(pos_dir, filename), 'r', encoding='utf-8') as f:
                     text = f.read()
-                    text = self._preprocess_text(text)
+                    text = preprocess_text(text)
                     self.samples.append(text)
                     self.labels.append(1)
 
@@ -37,7 +46,7 @@ class IMDBDataset(Dataset):
             if filename.endswith('.txt'):
                 with open(os.path.join(neg_dir, filename), 'r', encoding='utf-8') as f:
                     text = f.read()
-                    text = self._preprocess_text(text)
+                    text = preprocess_text(text)
                     self.samples.append(text)
                     self.labels.append(0)
         
@@ -51,26 +60,9 @@ class IMDBDataset(Dataset):
         label = self.labels[idx]
 
         if self.word2idx:
-            text = self._text_to_indices(text, self.word2idx)
+            text = text_to_indices(text, self.word2idx)
 
         return text, label
-
-    def _preprocess_text(self, text):
-        text = re.sub(r'<.*?>', ' ', text)
-        text = re.sub(r'\s+', ' ', text)
-        text = text.lower()
-        text = re.sub(r'[^a-z0-9\s.,!?;:]', '', text) 
-        return text.strip()
-
-    
-    def _text_to_indices(self, text, word2idx):
-        indices = []
-        for word in text.split():
-            if word in word2idx:
-                indices.append(word2idx[word])
-            else:
-                indices.append(word2idx['<UNK>'])
-        return indices
 
     @staticmethod
     def build_vocab(texts: list, max_vocab_size=30000, min_frequency=2):
@@ -85,6 +77,22 @@ class IMDBDataset(Dataset):
         word2idx['<PAD>'] = 0
         word2idx['<UNK>'] = 1
         return word2idx
+
+def preprocess_text(text):
+        text = re.sub(r'<.*?>', ' ', text)
+        text = re.sub(r'\s+', ' ', text)
+        text = text.lower()
+        text = re.sub(r'[^a-z0-9\s.,!?;:]', '', text) 
+        return text.strip()
+
+def text_to_indices(text, word2idx):
+        indices = []
+        for word in text.split():
+            if word in word2idx:
+                indices.append(word2idx[word])
+            else:
+                indices.append(word2idx['<UNK>'])
+        return indices
 
 def collate_fn(batch):
     texts, labels = zip(*batch)
