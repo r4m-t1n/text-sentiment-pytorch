@@ -1,8 +1,10 @@
+import torch
 import torch.nn as nn
+from data_loader import vocab_size
 
 class SentimentBinaryClassifier(nn.Module):
     def __init__(self, vocab_size, embedding_dim=256, hidden_dim=256, output_dim=1, dropout_prob=0.5):
-        super(SentimentBinaryClassifier, self).__init__()
+        super().__init__()
         self.embedding = nn.Embedding(vocab_size, embedding_dim, padding_idx=0)
         self.lstm = nn.LSTM(embedding_dim, hidden_dim, batch_first=True)
         self.fc = nn.Linear(hidden_dim, output_dim)
@@ -15,3 +17,9 @@ class SentimentBinaryClassifier(nn.Module):
         _, (hidden, _) = self.lstm(embedded)
         output = self.fc(hidden.squeeze(0))
         return self.sigmoid(output).squeeze(1)
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+model = SentimentBinaryClassifier(vocab_size=vocab_size).to(device)
+
+print('Model imported.')
