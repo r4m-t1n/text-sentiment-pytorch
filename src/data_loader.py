@@ -11,20 +11,9 @@ DATA_DIR = os.path.join('..', 'data')
 TRAIN_DIR = os.path.join(DATA_DIR, 'aclImdb', 'train')
 TEST_DIR = os.path.join(DATA_DIR, 'aclImdb', 'test')
 
-def set_seeds(seed_value=42):
-    random.seed(seed_value)
-    os.environ['PYTHONHASHSEED'] = str(seed_value)
-    torch.manual_seed(seed_value)
-    torch.cuda.manual_seed(seed_value)
-    torch.cuda.manual_seed_all(seed_value)
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
-
-set_seeds(42)
-
 class IMDBDataset(Dataset):
     def __init__(self, data_dir, size: int, word2idx=None):
-        super(IMDBDataset, self).__init__()
+        super().__init__()
 
         self.data_dir = data_dir
         self.samples = []
@@ -32,6 +21,10 @@ class IMDBDataset(Dataset):
 
         pos_dir = os.path.join(self.data_dir, 'pos')
         pos_files = random.sample(os.listdir(pos_dir), min(size, len(os.listdir(pos_dir))))
+
+        neg_dir = os.path.join(self.data_dir, 'neg')
+        neg_files = random.sample(os.listdir(neg_dir), min(size, len(os.listdir(neg_dir))))
+
         for filename in pos_files:
             if filename.endswith('.txt'):
                 with open(os.path.join(pos_dir, filename), 'r', encoding='utf-8') as f:
@@ -40,8 +33,6 @@ class IMDBDataset(Dataset):
                     self.samples.append(text)
                     self.labels.append(1)
 
-        neg_dir = os.path.join(self.data_dir, 'neg')
-        neg_files = random.sample(os.listdir(neg_dir), min(size, len(os.listdir(neg_dir))))
         for filename in neg_files:
             if filename.endswith('.txt'):
                 with open(os.path.join(neg_dir, filename), 'r', encoding='utf-8') as f:
@@ -49,7 +40,7 @@ class IMDBDataset(Dataset):
                     text = preprocess_text(text)
                     self.samples.append(text)
                     self.labels.append(0)
-        
+
         self.word2idx = word2idx
 
     def __len__(self):
@@ -103,13 +94,27 @@ def collate_fn(batch):
 
     return padded_texts, labels
 
-temp_train = IMDBDataset(TRAIN_DIR, 12500) 
+print('Importing data_loader...')
 
+print('Loading temp_train...')
+temp_train = IMDBDataset(TRAIN_DIR, 12500) 
+print('temp_train loaded.')
+
+print('Building vocabulary...')
 words2idx = IMDBDataset.build_vocab(temp_train.samples)
 vocab_size = len(words2idx)
+print(f'Vocabulary is built. Size: {vocab_size}')
 
+print('Defining train dataset...')
 train = IMDBDataset(TRAIN_DIR, 12500, words2idx)
+print('Train dataset defined.\nDefining test dataset...')
 test = IMDBDataset(TEST_DIR, 12500, words2idx)
+print('Test dataset defined.')
 
+print('Loading train dataset...')
 train_loader = DataLoader(train, batch_size=32, shuffle=True, collate_fn=collate_fn)
+print('Train dataset loaded.\nLoading test dataset...')
 test_loader = DataLoader(test, batch_size=32, shuffle=False, collate_fn=collate_fn)
+print('test dataset loaded.')
+
+print('data_loader imported successfully.')
