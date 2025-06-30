@@ -1,10 +1,8 @@
 import os
-import re
 import random
 import torch
-import torch.nn as nn
-from model import SentimentBinaryClassifier
-from data_loader import IMDBDataset, preprocess_text, text_to_indices, collate_fn, words2idx, vocab_size, TEST_DIR
+from model import model, device
+from data_loader import IMDBDataset, preprocess_text, text_to_indices, collate_fn, words2idx, TEST_DIR
 from torch.utils.data import DataLoader
 
 def set_seeds(seed_value=42):
@@ -18,11 +16,7 @@ def set_seeds(seed_value=42):
 
 set_seeds(42)
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
 MODEL_SAVE_PATH = 'sentiment_model.pt'
-
-model = SentimentBinaryClassifier(vocab_size=vocab_size).to(device)
 
 if os.path.exists(MODEL_SAVE_PATH):
     print(f"Loading trained model from {MODEL_SAVE_PATH}...")
@@ -59,7 +53,7 @@ def predict_text(model, text, word2idx, device):
 
 class SpecificSentimentDataset(IMDBDataset):
     def __init__(self, base_data_dir, word2idx, sentiment_type):
-        super(SpecificSentimentDataset, self).__init__() 
+        super().__init__() 
         self.samples = []
         self.labels = []
         

@@ -16,14 +16,11 @@ def set_seeds(seed_value=42):
 set_seeds(42)
 print('Seeds are set.')
 
-from model import SentimentBinaryClassifier
-from data_loader import train_loader, test_loader, vocab_size 
-
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+from data_loader import train_loader, test_loader
+from model import model, device
 
 MODEL_SAVE_PATH = 'sentiment_model.pt'
 
-model = SentimentBinaryClassifier(vocab_size=vocab_size).to(device)
 criterion = nn.BCELoss()
 optimizer = optim.Adam(model.parameters(), lr=0.0005)
 
