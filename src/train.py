@@ -1,7 +1,21 @@
 import os
+import random
 import torch
 import torch.nn as nn
 import torch.optim as optim
+
+def set_seeds(seed_value=42):
+    random.seed(seed_value)
+    os.environ['PYTHONHASHSEED'] = str(seed_value)
+    torch.manual_seed(seed_value)
+    torch.cuda.manual_seed(seed_value)
+    torch.cuda.manual_seed_all(seed_value)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+set_seeds(42)
+print('Seeds are set.')
+
 from model import SentimentBinaryClassifier
 from data_loader import train_loader, test_loader, vocab_size 
 
@@ -60,9 +74,7 @@ def evaluate(model, dataloader, criterion, device):
     accuracy = correct / total
     return total_loss / len(dataloader), accuracy
 
-
-if __name__ == "__main__":
-
+def start_training():
     num_epochs = 20
 
     for epoch in range(start_epoch, num_epochs):
@@ -87,3 +99,6 @@ if __name__ == "__main__":
         print("-" * 30)
 
     print("Training finished.")
+
+if __name__ == "__main__":
+    start_training()
