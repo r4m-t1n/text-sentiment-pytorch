@@ -49,8 +49,10 @@ class IMDBDataset(Dataset):
         for text in texts:
             words = text.split()
             counter.update(words)
-        vocab = {word for word, freq in counter.most_common(max_vocab_size) if freq >= min_frequency}
-        vocab = list(vocab)
+        
+        most_common_words = counter.most_common(max_vocab_size)
+        
+        vocab = [word for word, freq in most_common_words if freq >= min_frequency]
 
         word2idx = {word: idx+2 for idx, word in enumerate(vocab)}
         word2idx['<PAD>'] = 0
