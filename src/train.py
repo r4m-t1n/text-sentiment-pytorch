@@ -24,9 +24,6 @@ MODEL_SAVE_PATH = 'sentiment_model.pt'
 criterion = nn.BCELoss()
 optimizer = optim.Adam(model.parameters(), lr=0.0005)
 
-start_epoch = 0
-best_accuracy = 0.0
-
 if os.path.exists(MODEL_SAVE_PATH):
     print(f"Loading previous model from {MODEL_SAVE_PATH}...")
     checkpoint = torch.load(MODEL_SAVE_PATH)
@@ -71,7 +68,10 @@ def evaluate(model, dataloader, criterion, device):
     accuracy = correct / total
     return total_loss / len(dataloader), accuracy
 
-def start_training():
+def start_training():    
+    start_epoch = 0
+    best_accuracy = 0.0
+
     num_epochs = 20
 
     for epoch in range(start_epoch, num_epochs):
