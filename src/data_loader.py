@@ -1,45 +1,33 @@
 import os
 import re
-import random
 from collections import Counter
 
 import torch
 from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import Dataset, DataLoader
+from sklearn.datasets import load_files
 
 DATA_DIR = os.path.join('..', 'data')
 TRAIN_DIR = os.path.join(DATA_DIR, 'aclImdb', 'train')
 TEST_DIR = os.path.join(DATA_DIR, 'aclImdb', 'test')
 
 class IMDBDataset(Dataset):
-    def __init__(self, data_dir, size: int, word2idx=None):
+    def __init__(self, data_dir, word2idx=None):
         super().__init__()
 
         self.data_dir = data_dir
-        self.samples = []
-        self.labels = []
 
-        pos_dir = os.path.join(self.data_dir, 'pos')
-        pos_files = random.sample(os.listdir(pos_dir), min(size, len(os.listdir(pos_dir))))
+        imdb_data = load_files(
+            data_dir, 
+            shuffle=True, 
+            random_state=42, 
+            encoding='utf-8'
+        )
 
-        neg_dir = os.path.join(self.data_dir, 'neg')
-        neg_files = random.sample(os.listdir(neg_dir), min(size, len(os.listdir(neg_dir))))
+        raw_samples = imdb_data.data
+        self.labels = imdb_data.target.tolist() 
 
-        for filename in pos_files:
-            if filename.endswith('.txt'):
-                with open(os.path.join(pos_dir, filename), 'r', encoding='utf-8') as f:
-                    text = f.read()
-                    text = preprocess_text(text)
-                    self.samples.append(text)
-                    self.labels.append(1)
-
-        for filename in neg_files:
-            if filename.endswith('.txt'):
-                with open(os.path.join(neg_dir, filename), 'r', encoding='utf-8') as f:
-                    text = f.read()
-                    text = preprocess_text(text)
-                    self.samples.append(text)
-                    self.labels.append(0)
+        self.samples = [preprocess_text(text) for text in raw_samples]
 
         self.word2idx = word2idx
 
@@ -70,25 +58,25 @@ class IMDBDataset(Dataset):
         return word2idx
 
 def preprocess_text(text):
-        text = re.sub(r'<.*?>', ' ', text)
-        text = re.sub(r'\s+', ' ', text)
-        text = text.lower()
-        text = re.sub(r'[^a-z0-9\s.,!?;:]', '', text) 
-        return text.strip()
+    text = re.sub(r'<.*?>', ' ', text)
+    text = re.sub(r'\s+', ' ', text)
+    text = text.lower()
+    text = re.sub(r'[^a-z0-9\s.,!?;:]', '', text) 
+    return text.strip()
 
 def text_to_indices(text, word2idx):
-        indices = []
-        for word in text.split():
-            if word in word2idx:
-                indices.append(word2idx[word])
-            else:
-                indices.append(word2idx['<UNK>'])
-        return indices
+    indices = []
+    for word in text.split():
+        if word in word2idx:
+            indices.append(word2idx[word])
+        else:
+            indices.append(word2idx['<UNK>'])
+    return indices
 
 def collate_fn(batch):
     texts, labels = zip(*batch)
-    texts = [torch.tensor(text) for text in texts]
-    labels = torch.tensor(labels)
+    texts = [torch.tensor(text, dtype=torch.long) for text in texts]
+    labels = torch.tensor(labels, dtype=torch.long)
 
     padded_texts = pad_sequence(texts, batch_first=True, padding_value=0)
 
@@ -97,7 +85,7 @@ def collate_fn(batch):
 print('Importing data_loader...')
 
 print('Loading temp_train...')
-temp_train = IMDBDataset(TRAIN_DIR, 12500) 
+temp_train = IMDBDataset(TRAIN_DIR) 
 print('temp_train loaded.')
 
 print('Building vocabulary...')
@@ -106,9 +94,9 @@ vocab_size = len(words2idx)
 print(f'Vocabulary is built. Size: {vocab_size}')
 
 print('Defining train dataset...')
-train = IMDBDataset(TRAIN_DIR, 12500, words2idx)
+train = IMDBDataset(TRAIN_DIR, words2idx)
 print('Train dataset defined.\nDefining test dataset...')
-test = IMDBDataset(TEST_DIR, 12500, words2idx)
+test = IMDBDataset(TEST_DIR, words2idx)
 print('Test dataset defined.')
 
 print('Loading train dataset...')
