@@ -84,27 +84,13 @@ def collate_fn(batch):
 
     return padded_texts, labels
 
-print('Importing data_loader...')
+temp_train = IMDBDataset(TRAIN_DIR)
 
-print('Loading temp_train...')
-temp_train = IMDBDataset(TRAIN_DIR) 
-print('temp_train loaded.')
-
-print('Building vocabulary...')
 words2idx = IMDBDataset.build_vocab(temp_train.samples)
 vocab_size = len(words2idx)
-print(f'Vocabulary is built. Size: {vocab_size}')
 
-print('Defining train dataset...')
 train = IMDBDataset(TRAIN_DIR, words2idx)
-print('Train dataset defined.\nDefining test dataset...')
 test = IMDBDataset(TEST_DIR, words2idx)
-print('Test dataset defined.')
 
-print('Loading train dataset...')
 train_loader = DataLoader(train, batch_size=32, shuffle=True, collate_fn=collate_fn)
-print('Train dataset loaded.\nLoading test dataset...')
 test_loader = DataLoader(test, batch_size=32, shuffle=False, collate_fn=collate_fn)
-print('test dataset loaded.')
-
-print('data_loader imported successfully.')
