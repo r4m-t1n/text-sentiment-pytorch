@@ -1,25 +1,21 @@
 import torch
 import torch.nn as nn
-from data_loader import vocab_size
 
 class SentimentBinaryClassifier(nn.Module):
-    def __init__(self, vocab_size, embedding_dim=256, hidden_dim=256, output_dim=1, dropout_prob=0.5):
+    def __init__(self, vocab_size, embedding_dim=256, hidden_dim=128, output_dim=1, dropout_prob=0.5):
         super().__init__()
         self.embedding = nn.Embedding(vocab_size, embedding_dim, padding_idx=0)
-        self.lstm = nn.LSTM(embedding_dim, hidden_dim, batch_first=True)
+        self.lstm = nn.LSTM(input_size=embedding_dim, hidden_size=hidden_dim,
+                            num_layers=1, batch_first=True)
         self.fc = nn.Linear(hidden_dim, output_dim)
         self.sigmoid = nn.Sigmoid()
         self.dropout = nn.Dropout(dropout_prob)
 
     def forward(self, x):
-        embedded = self.embedding(x)
-        embedded = self.dropout(embedded)
-        _, (hidden, _) = self.lstm(embedded)
-        output = self.fc(hidden.squeeze(0))
-        return self.sigmoid(output).squeeze(1)
-
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-model = SentimentBinaryClassifier(vocab_size=vocab_size).to(device)
-
-print('Model imported.')
+        x = self.embedding(x.long())
+        lstm_out, _ = self.lstm(x)
+        output = lstm_out[:, -1, :]
+        output = self.dropout(output)
+        output = self.fc(output)
+        output = torch.sigmoid(output).squeeze(1)
+        return output
