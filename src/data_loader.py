@@ -78,7 +78,7 @@ def text_to_indices(text, word2idx):
 def collate_fn(batch):
     texts, labels = zip(*batch)
     texts = [torch.tensor(text, dtype=torch.long) for text in texts]
-    labels = torch.tensor(labels, dtype=torch.long)
+    labels = torch.tensor(labels, dtype=torch.float)
 
     padded_texts = pad_sequence(texts, batch_first=True, padding_value=0)
 
