@@ -1,5 +1,8 @@
+import os
 import torch
 import torch.nn as nn
+
+MODEL_PATH = os.path.join('..', 'models', 'sentiment_model.pt')
 
 class SentimentBinaryClassifier(nn.Module):
     def __init__(self, vocab_size, embedding_dim=256, hidden_dim=128, output_dim=1, dropout_prob=0.5):

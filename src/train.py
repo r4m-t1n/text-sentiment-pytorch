@@ -15,10 +15,8 @@ def set_seeds(seed_value=42):
 
 set_seeds(42)
 
-from model import SentimentBinaryClassifier
+from model import SentimentBinaryClassifier, MODEL_PATH
 from data_loader import train_loader, test_loader, vocab_size
-
-MODEL_SAVE_PATH = 'sentiment_model.pt'
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -61,9 +59,9 @@ def start_training():
     start_epoch = 0
     best_accuracy = 0.0
 
-    if os.path.exists(MODEL_SAVE_PATH):
-        print(f"Loading previous model from {MODEL_SAVE_PATH}...")
-        checkpoint = torch.load(MODEL_SAVE_PATH)
+    if os.path.exists(MODEL_PATH):
+        print(f"Loading previous model from {MODEL_PATH}...")
+        checkpoint = torch.load(MODEL_PATH)
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
         start_epoch = checkpoint['epoch'] + 1
@@ -93,7 +91,7 @@ def start_training():
                 'optimizer_state_dict': optimizer.state_dict(),
                 'loss': val_loss,
                 'accuracy': val_acc,
-            }, MODEL_SAVE_PATH)
+            }, MODEL_PATH)
             print(f"Model saved with accuracy {val_acc:.4f}.")
 
         print("-" * 30)
