@@ -15,8 +15,8 @@ def set_seeds(seed_value=42):
 
 set_seeds(42)
 
-from data_loader import train_loader, test_loader, vocab_size
 from model import SentimentBinaryClassifier
+from data_loader import train_loader, test_loader, vocab_size
 
 MODEL_SAVE_PATH = 'sentiment_model.pt'
 
@@ -26,20 +26,6 @@ model = SentimentBinaryClassifier(vocab_size=vocab_size).to(device)
 
 criterion = nn.BCELoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
-
-if os.path.exists(MODEL_SAVE_PATH):
-    print(f"Loading previous model from {MODEL_SAVE_PATH}...")
-    checkpoint = torch.load(MODEL_SAVE_PATH)
-    model.load_state_dict(checkpoint['model_state_dict'])
-    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-    start_epoch = checkpoint['epoch'] + 1
-    best_accuracy = checkpoint['accuracy']
-    print(f"Resuming training from Epoch {start_epoch} with previous accuracy {best_accuracy:.4f}.")
-else:
-    print("No saved model found. Starting training from scratch.")
-
-print("Starting model training...")
-print("-" * 30)
 
 def train(model, dataloader, criterion, optimizer, device):
     model.train()
@@ -75,7 +61,21 @@ def start_training():
     start_epoch = 0
     best_accuracy = 0.0
 
-    num_epochs = 20
+    if os.path.exists(MODEL_SAVE_PATH):
+        print(f"Loading previous model from {MODEL_SAVE_PATH}...")
+        checkpoint = torch.load(MODEL_SAVE_PATH)
+        model.load_state_dict(checkpoint['model_state_dict'])
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        start_epoch = checkpoint['epoch'] + 1
+        best_accuracy = checkpoint['accuracy']
+        print(f"Resuming training from Epoch {start_epoch} with previous accuracy {best_accuracy:.4f}.")
+    else:
+        print("No saved model found. Starting training from scratch.")
+
+    print("Starting model training...")
+    print("-" * 30)
+
+    num_epochs = 14
 
     for epoch in range(start_epoch, num_epochs):
         train_loss = train(model, train_loader, criterion, optimizer, device)
