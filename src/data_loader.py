@@ -7,7 +7,7 @@ from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import Dataset, DataLoader
 from sklearn.datasets import load_files
 
-WORDS_PATH = os.path.join('..', 'models', 'words2idx.pt')
+WORDS_PATH = os.path.join('..', 'models', 'word2idx.pt')
 DATA_DIR = os.path.join('..', 'data')
 TRAIN_DIR = os.path.join(DATA_DIR, 'aclImdb', 'train')
 TEST_DIR = os.path.join(DATA_DIR, 'aclImdb', 'test')
@@ -60,7 +60,7 @@ class IMDBDataset(Dataset):
         word2idx['<UNK>'] = 1
 
         with open(WORDS_PATH, 'wb') as f:
-            pickle.dump(words2idx, f)
+            pickle.dump(word2idx, f)
 
         return word2idx
 
@@ -93,20 +93,20 @@ def load_vocab():
     if not os.path.exists(WORDS_PATH):
         raise FileNotFoundError(f"Vocabulary file not found at {WORDS_PATH}. ")
     with open(WORDS_PATH, 'rb') as f:
-        words2idx = pickle.load(f)
-    return words2idx
+        word2idx = pickle.load(f)
+    return word2idx
 
 temp_train = IMDBDataset(TRAIN_DIR)
 
 if os.path.exists(WORDS_PATH):
-    words2idx = load_vocab()
-    vocab_size = len(words2idx)
+    word2idx = load_vocab()
+    vocab_size = len(word2idx)
 else:
-    words2idx = IMDBDataset.build_vocab(temp_train.samples)
-vocab_size = len(words2idx)
+    word2idx = IMDBDataset.build_vocab(temp_train.samples)
+vocab_size = len(word2idx)
 
-train = IMDBDataset(TRAIN_DIR, words2idx)
-test = IMDBDataset(TEST_DIR, words2idx)
+train = IMDBDataset(TRAIN_DIR, word2idx)
+test = IMDBDataset(TEST_DIR, word2idx)
 
 train_loader = DataLoader(train, batch_size=32, shuffle=True, collate_fn=collate_fn)
 test_loader = DataLoader(test, batch_size=32, shuffle=False, collate_fn=collate_fn)

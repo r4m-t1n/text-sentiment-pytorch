@@ -15,7 +15,7 @@ def set_seeds(seed_value=42):
 set_seeds(42)
 
 from model import SentimentBinaryClassifier, MODEL_PATH
-from data_loader import IMDBDataset, preprocess_text, collate_fn, words2idx, vocab_size, TEST_DIR
+from data_loader import IMDBDataset, preprocess_text, collate_fn, word2idx, vocab_size, TEST_DIR
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -57,7 +57,7 @@ class SpecificSentimentDataset(IMDBDataset):
 if __name__ == "__main__":
 
     print("\n--- Predicting on positive IMDB reviews from test set ---")
-    pos_test_dataset = SpecificSentimentDataset(TEST_DIR, words2idx, 'pos') 
+    pos_test_dataset = SpecificSentimentDataset(TEST_DIR, word2idx, 'pos') 
     pos_test_loader = DataLoader(pos_test_dataset, batch_size=32, shuffle=False, collate_fn=collate_fn)
 
     correct_predictions_pos = 0
@@ -83,7 +83,7 @@ if __name__ == "__main__":
         print("No positive reviews found or processed in the test set 'pos' directory.")
 
     print("\n--- Predicting on negative reviews from test set ---")
-    neg_test_dataset = SpecificSentimentDataset(TEST_DIR, words2idx, 'neg')
+    neg_test_dataset = SpecificSentimentDataset(TEST_DIR, word2idx, 'neg')
     neg_test_loader = DataLoader(neg_test_dataset, batch_size=32, shuffle=False, collate_fn=collate_fn)
 
     correct_predictions_neg = 0

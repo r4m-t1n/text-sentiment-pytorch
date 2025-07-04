@@ -1,6 +1,6 @@
 import torch
 from model import SentimentBinaryClassifier, MODEL_PATH
-from data_loader import preprocess_text, text_to_indices, words2idx, vocab_size
+from data_loader import preprocess_text, text_to_indices, word2idx, vocab_size
 
 def predict_text(model, text, word2idx, device):
 
@@ -37,5 +37,5 @@ if __name__ == "__main__":
         if text == "-1":
             break
 
-        sentiment, probability = predict_text(model, text, words2idx, device)
+        sentiment, probability = predict_text(model, text, word2idx, device)
         print(f"  Predicted Sentiment: {sentiment} (Probability: {probability:.4f})")
