@@ -51,7 +51,6 @@ Follow these steps to set up the project on your local machine.
             pip install -r requirements/requirements_train.txt
             ```
             *(Note: `requirements/requirements_train.txt` includes `torch==2.3.0+cu118` with its specific index URL. Make sure your system's CUDA Toolkit version matches `cu118` or adjust the version in the file. You can also browse available PyTorch wheels here: [https://download.pytorch.org/whl/torch_stable.html](https://download.pytorch.org/whl/torch_stable.html))*
-            ```
 
 ## Usage
 
