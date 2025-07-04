@@ -4,20 +4,23 @@ import pickle
 import torch
 from src.model import SentimentBinaryClassifier
 
-dependencies = ['numpy==1.24.3', 'scikit-learn==1.4.2', 'torch==2.3.0']
+dependencies = ['numpy', 'sklearn', 'torch']
 
 MODEL_PATH = os.path.join(os.path.dirname(__file__), 'models', 'sentiment_model.pt')
-WORDS_PATH = os.path.join(os.path.dirname(__file__), 'models', 'words2idx.pickle')
+WORDS_PATH = os.path.join(os.path.dirname(__file__), 'models', 'word2idx.pickle')
 
 def _load_vocab():
     if not os.path.exists(WORDS_PATH):
         raise FileNotFoundError(f"Vocabulary file not found at {WORDS_PATH}. ")
     with open(WORDS_PATH, 'rb') as f:
-        words2idx = pickle.load(f)
-    return words2idx
+        word2idx = pickle.load(f)
+    return word2idx
 
-words2idx = _load_vocab()
-vocab_size = len(words2idx)
+word2idx_v = _load_vocab()
+vocab_size = len(word2idx_v)
+
+def word2idx():
+    return word2idx_v
 
 def sentiment_classifier(pretrained=True, device=None, **kwargs):
 
