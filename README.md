@@ -10,7 +10,7 @@ Follow these steps to set up the project on your local machine.
 
 1.  **Clone the repository:**
     ```bash
-    git clone [https://github.com/r4m-t1n/text-sentiment-pytorch](https://github.com/r4m-t1n/text-sentiment-pytorch)
+    git clone https://github.com/r4m-t1n/text-sentiment-pytorch
     cd text-sentiment-pytorch
     ```
 
