@@ -7,7 +7,7 @@ from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import Dataset, DataLoader
 from sklearn.datasets import load_files
 
-WORDS_PATH = os.path.join('..', 'models', 'word2idx.pt')
+WORDS_PATH = os.path.join('..', 'models', 'word2idx.pickle')
 DATA_DIR = os.path.join('..', 'data')
 TRAIN_DIR = os.path.join(DATA_DIR, 'aclImdb', 'train')
 TEST_DIR = os.path.join(DATA_DIR, 'aclImdb', 'test')
