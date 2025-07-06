@@ -20,5 +20,5 @@ class SentimentBinaryClassifier(nn.Module):
         output = lstm_out[:, -1, :]
         output = self.dropout(output)
         output = self.fc(output)
-        output = torch.sigmoid(output).squeeze(1)
+        output = self.sigmoid(output).squeeze(1)
         return output
