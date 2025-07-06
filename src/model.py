@@ -1,5 +1,4 @@
 import os
-import torch
 import torch.nn as nn
 
 MODEL_PATH = os.path.join('..', 'models', 'sentiment_model.pt')
