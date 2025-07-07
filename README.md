@@ -4,6 +4,15 @@
 
 This project implements a binary sentiment classifier for IMDB movie reviews using a Long Short Term Memory (LSTM) neural network with PyTorch. It's designed to classify reviews as either positive or negative. The project includes scripts for data loading, model training, evaluation, and predictions on new text, and is also configured for easy integration with PyTorch Hub.
 
+## Training Summary
+
+|      Metric       |   Value    |
+|-------------------|------------|
+|   Val Accuracy    |   85.45%   |
+|   Epoch Reached   |   14       |
+|   Val Loss        |   0.3807   |
+|   Train Loss      |   0.1613   |
+
 ## Installation
 
 Follow these steps to set up the project on your local machine.
